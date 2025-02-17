@@ -1,14 +1,52 @@
+
 # WCE_ACE_Hackathon
 
-Steps to Run the project Backend
 
-cd Backend
-npm i (only in starting or whenever you install the new package)
 
-nodemon app.js
+## Team Members
 
-Steps to Run the project Frontend
-cd Frontend
-npm i (only in starting or whenever you install the new package)
+- **Parth Kulkarni** (Hackathon Leader)
+- **Samarth Bolaj**
+- **Varun Balbudhe**
 
-npm run dev
+
+
+
+## Steps to Run the Project
+
+### Backend
+
+1. Navigate to the **Backend** directory:
+   ```bash
+   cd Backend
+   ```
+
+2. Install dependencies (only once at the beginning or whenever you install a new package):
+   ```bash
+   npm i
+   ```
+
+3. Run the backend using **nodemon**:
+   ```bash
+   nodemon app.js
+   ```
+
+---
+
+### Frontend
+
+1. Navigate to the **Frontend** directory:
+   ```bash
+   cd Frontend
+   ```
+
+2. Install dependencies (only once at the beginning or whenever you install a new package):
+   ```bash
+   npm i
+   ```
+
+3. Run the frontend using:
+   ```bash
+   npm run dev
+   ```
+
