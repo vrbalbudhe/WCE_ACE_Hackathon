@@ -1,11 +1,68 @@
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
+import LoginForm from "../auth/loginForm";
+import { AuthContext } from "../../contexts/AuthContext";
+import { Navigate, useNavigate } from "react-router-dom";
+import axios from "axios";
+import RegisterForm from "../auth/registerForm";
 
 const Navbar = () => {
+  const [isLogin, setIsLogin] = useState(false);
+  const [isRegister, setIsRegister] = useState(false);
+  const [error, setError] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const { currentUser, refreshLoginContext, setLoading } =
+    useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const handleLoginToggle = () => {
+    setIsLogin((prev) => !prev);
+  };
+
+  const handleRegisterToggle = () => {
+    setIsRegister((prev) => !prev);
+  };
+
+  const handleLogout = async () => {
+    setError("");
+    setLoading(true);
+
+    try {
+      const response = await axios.post(
+        "http://localhost:8000/api/auth/logout",
+        {},
+        { withCredentials: true }
+      );
+      // console.log(response);
+
+      if (response?.data?.success) {
+        await refreshLoginContext();
+        setIsLogin(false);
+        setLoading(true);
+      }
+    } catch (err) {
+      console.log(err);
+      setError(err.response?.data?.message || "Logout failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleNavigationToProfile = (id) => {
+    navigate(`/user/${id}`);
+    setIsDropdownOpen(false);
+  };
+
+  const handleDropdownToggle = () => {
+    setIsDropdownOpen((prev) => !prev);
+  };
+
+  useEffect(() => {
+    refreshLoginContext();
+  }, []);
+
   return (
     <nav className="w-full h-16 bg-[#ffffff] border-b border-gray-300 flex items-center px-4 justify-between">
-      {/* Left section */}
       <div className="flex items-center space-x-4">
-        {/* Menu Icon */}
         <svg
           className="w-5 h-5 text-gray-600 hover:text-gray-600 cursor-pointer"
           viewBox="0 0 24 24"
@@ -28,76 +85,124 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Center section */}
-      <div className="flex-1 max-w-xl mx-4">
-        <div className="relative">
-          {/* Search Icon */}
+      {
+        <div className="flex-1 max-w-xl mx-4">
+          <div className="relative">
+            <svg
+              className="w-4 h-4 text-gray-800 absolute left-3 top-2.5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <circle cx="11" cy="11" r="8" />
+              <path
+                d="M21 21l-4.35-4.35"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            <input
+              type="text"
+              placeholder="Search"
+              className="w-full bg-white text-gray-800 border-2 border-gray-300 outline-none ring-0 placeholder-gray-500 pl-10 pr-4 py-2 rounded-lg text-sm focus:outline-none"
+            />
+          </div>
+        </div>
+      }
+
+      {currentUser && (
+        <div className="flex items-center space-x-4">
           <svg
-            className="w-4 h-4 text-gray-800 absolute left-3 top-2.5"
+            className="w-5 h-5 text-gray-800 hover:text-gray-600 cursor-pointer"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
             strokeWidth="2"
           >
-            <circle cx="11" cy="11" r="8" />
-            <path
-              d="M21 21l-4.35-4.35"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
           </svg>
-          <input
-            type="text"
-            placeholder="Search"
-            className="w-full bg-white text-gray-800 border-2 border-gray-300 outline-none ring-0 placeholder-gray-500 pl-10 pr-4 py-2 rounded-lg text-sm focus:outline-none"
-          />
+
+          <svg
+            className="w-5 h-5 text-gray-800 hover:text-gray-600 cursor-pointer"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+          </svg>
+
+          <svg
+            className="w-5 h-5 text-gray-800 hover:text-gray-600 cursor-pointer"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            <circle cx="12" cy="12" r="3" />
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+          </svg>
+
+          <div className="relative">
+            <div
+              onClick={handleDropdownToggle}
+              className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center cursor-pointer"
+            >
+              <span className="text-white text-sm font-medium">
+                {currentUser?.name?.charAt(0).toUpperCase()}
+              </span>
+            </div>
+
+            {isDropdownOpen && (
+              <div className="absolute right-0 mt-2 w-52 bg-white border border-gray-300 rounded-lg shadow-md z-50">
+                <div className="px-4 py-2 text-sm text-gray-200 rounded-t-lg bg-gray-900 border-b">
+                  {currentUser?.email}
+                </div>
+                <div
+                  onClick={() => handleNavigationToProfile(currentUser?.id)}
+                  className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 cursor-pointer"
+                >
+                  Profile
+                </div>
+                <div className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 cursor-pointer">
+                  Settings
+                </div>
+                <div
+                  onClick={() => handleLogout()}
+                  className="px-4 py-2 text-sm text-red-600 hover:bg-gray-200 cursor-pointer"
+                >
+                  Logout
+                </div>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* Right section */}
-      <div className="flex items-center space-x-4">
-        {/* Users Icon */}
-        <svg
-          className="w-5 h-5 text-gray-800 hover:text-gray-600 cursor-pointer"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-        >
-          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-          <circle cx="9" cy="7" r="4" />
-          <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-        </svg>
+      {isLogin && !isRegister && <LoginForm setIsLogin={setIsLogin} />}
+      {isRegister && !isLogin && <RegisterForm setIsRegister={setIsRegister} />}
 
-        {/* Bell Icon */}
-        <svg
-          className="w-5 h-5 text-gray-800 hover:text-gray-600 cursor-pointer"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-        >
-          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-          <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-        </svg>
-
-        {/* Settings Icon */}
-        <svg
-          className="w-5 h-5 text-gray-800 hover:text-gray-600 cursor-pointer"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-        >
-          <circle cx="12" cy="12" r="3" />
-          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
-        </svg>
-
-        <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
-          <span className="text-white text-sm font-medium">US</span>
+      {!currentUser && (
+        <div className="flex items-center space-x-2">
+          <div
+            onClick={() => handleRegisterToggle()}
+            className="px-5 py-1.5 cursor-pointer text-white rounded-2xl text-sm flex justify-center items-center bg-blue-500"
+          >
+            <p>Register</p>
+          </div>
+          <div
+            onClick={() => handleLoginToggle()}
+            className="px-5 cursor-pointer text-white py-1.5 rounded-2xl text-sm flex justify-center items-center hover:bg-gray-700 bg-gray-900"
+          >
+            <p>Login</p>
+          </div>
         </div>
-      </div>
+      )}
     </nav>
   );
 };

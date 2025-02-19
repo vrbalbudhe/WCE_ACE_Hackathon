@@ -1,10 +1,14 @@
-import { Outlet } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 import Navbar from "../components/layoutCp/Navbar";
 import Footer from "../components/layoutCp/Footer";
-import React from "react";
+import React, { useContext } from "react";
+import { AuthContext } from "../contexts/AuthContext";
 
-export const PublicLayout = () => {
-  return (
+export const ProtectedLayout = () => {
+  const { currentUser } = useContext(AuthContext);
+  return !currentUser ? (
+    <Navigate to="/" />
+  ) : (
     <div className="min-h-screen w-full flex flex-col bg-white">
       <div className="sticky top-0 z-40 w-full">
         <Navbar />
